@@ -1,22 +1,20 @@
 import asyncio
 import asyncio.events
 import websockets.exceptions
-from websockets.asyncio.server import serve
+import websockets.asyncio.server
 
 from threading import Lock
-import cv2
 from datetime import datetime
 
 import commands
+import arm
+import video
 
 # Constants and configuration
 
 ADDRESS = "localhost"
 PORT = 8765
 PING_DELAY = 5.0
-
-img = cv2.imread("doge.png")
-img_data = cv2.imencode('.png', img)[1].tobytes()
 
 # Code
 
@@ -27,13 +25,15 @@ class Main():
     is_sending = False
     is_receiving = False
 
-    data = "beans"
     logging = ""
-
     logging_lock = Lock()
 
+    data = ""
+
     server_task = None
-    input_task = None
+    term_task = None
+    arm_task = None
+    video_task = None
 
     def toggle(self, words : str):
         truth = words[1].lower() in ['true', '1', 't', 
@@ -61,8 +61,14 @@ class Main():
 
     async def periodic_ping(self, seconds, websocket):
         while True:
-            await asyncio.sleep(seconds)
-            await websocket.ping()
+            try:
+                await asyncio.sleep(seconds)
+                await websocket.ping()
+
+            except websockets.exceptions.ConnectionClosed:
+                self.current_client = None
+                self.log_print(f"Client disconnected: {websocket.remote_address}\n", False)
+                return
 
             timestamp = datetime.now()
             formatted_timestamp = timestamp.strftime('%Y-%m-%d %H:%M:%S')
@@ -81,17 +87,14 @@ class Main():
         asyncio.create_task(self.periodic_ping(PING_DELAY, websocket))
 
         while self.active:
-            await asyncio.sleep(0)
             try:
+                await asyncio.sleep(0)
                 if (self.is_sending):
                     await websocket.send(self.data)
-                if (self.is_receiving):
-                    received = await websocket.recv()
-                    self.log_print(f"Received data [{received}]\n", False)
             except websockets.exceptions.ConnectionClosed:
                 self.current_client = None
                 self.log_print(f"Client disconnected: {websocket.remote_address}\n", False)
-                break
+                return
 
     async def run_server(self):
         self.log_print(f"Server initiated at [{ADDRESS}@{PORT}]\n", True)
@@ -100,12 +103,21 @@ class Main():
 
     async def run(self):
         try:
-            self.server_task = asyncio.create_task(self.run_server()) 
-            input_coroutine = asyncio.to_thread(self.run_terminal)
-            self.input_task = asyncio.create_task(input_coroutine)
+            self.server_task = asyncio.create_task(self.run_server())
+
+            term_coroutine = asyncio.to_thread(self.run_terminal)
+            self.term_task = asyncio.create_task(term_coroutine)
+            
+            arm_coroutine = asyncio.to_thread(arm.run_arm, self)
+            self.arm_task = asyncio.create_task(arm_coroutine)
+
+            video_coroutine = asyncio.to_thread(video.run_video, self)
+            self.video_task = asyncio.create_task(video_coroutine)
 
             await self.server_task
-            await self.input_task
+            await self.term_task
+            await self.arm_task
+            await self.video_task
         except asyncio.CancelledError:
             print("Terminated server.")
 
