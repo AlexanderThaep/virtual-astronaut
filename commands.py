@@ -5,6 +5,10 @@ class CommandShell(cmd.Cmd):
     intro = "Virtual Astronaut shell initiated... Type ? to list commands.\n"
     prompt = "> "
 
+    def do_status(self, args):
+        'Print information about the server'
+        print(self.main)
+
     def do_client(self, args):
         'Print information about the current connected client'
         if (self.main.current_client is None):

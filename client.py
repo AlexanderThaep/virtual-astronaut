@@ -5,6 +5,8 @@ from websockets.asyncio.client import connect
 async def receive():
     uri = "ws://localhost:8765"
     async with connect(uri) as websocket:
+        await asyncio.sleep(1)
+        await websocket.send("Beans!")
         try:
             async for message in websocket:
                 print(message)
