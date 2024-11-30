@@ -14,7 +14,9 @@ class CommandShell(cmd.Cmd):
         if (self.main.current_client is None):
             print("No client connected!\n")
         else:
-            print(self.main.current_client.remote_address)
+            print(f"Client address: {self.main.current_client.remote_address[0]}\n")
+            print(f"Client port: {self.main.current_client.remote_address[1]}\n")
+            print(f"Client UDP port: {self.main.client_udp_port}\n")
 
     def do_toggle(self, args : str):
         "Toggle a boolean attribute of the server"

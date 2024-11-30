@@ -2,7 +2,6 @@ import asyncio
 import asyncio.events
 import websockets.exceptions
 import websockets.asyncio.server
-import msgpack
 
 from threading import Lock
 from datetime import datetime
@@ -36,13 +35,13 @@ class Main():
     arm_task = None
     video_task = None
 
-    client_udp_port = None 
+    client_udp_port = None
     recv_queue = asyncio.Queue()
 
     def __str__(self):
         return f"\
 Current client: {self.current_client}\n\
-Client UDP Port: {self.client_udp_port}\n\
+Client UDP port: {self.client_udp_port}\n\
 Active: {self.active}\n\
 Is sending: {self.is_sending}\n\
 Is receiving: {self.is_receiving}\n\
@@ -102,12 +101,7 @@ Command queue: {self.recv_queue}\n"
             await asyncio.sleep(0)
             if self.is_receiving:
                 received = await websocket.recv()
-                result = msgpack.unpackb(received, object_pairs_hook=dict)
-
-                if result.get("Port"):
-                    self.client_udp_port = result["Port"]
-                        
-                await self.recv_queue.put(result)
+                await self.recv_queue.put(received)
 
     async def handle_client(self, websocket):
         if self.current_client is not None:
