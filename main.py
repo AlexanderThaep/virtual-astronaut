@@ -2,6 +2,7 @@ import asyncio
 import asyncio.events
 import websockets.exceptions
 import websockets.asyncio.server
+import msgpack
 
 from threading import Lock
 from datetime import datetime
@@ -22,8 +23,8 @@ class Main():
     current_client = None
     active = True
 
-    is_sending = False
-    is_receiving = False
+    is_sending = True
+    is_receiving = True
 
     logging = ""
     logging_lock = Lock()
@@ -35,11 +36,13 @@ class Main():
     arm_task = None
     video_task = None
 
+    client_udp_port = None 
     recv_queue = asyncio.Queue()
 
     def __str__(self):
         return f"\
 Current client: {self.current_client}\n\
+Client UDP Port: {self.client_udp_port}\n\
 Active: {self.active}\n\
 Is sending: {self.is_sending}\n\
 Is receiving: {self.is_receiving}\n\
@@ -62,11 +65,10 @@ Command queue: {self.recv_queue}\n"
             case "receiving":
                 self.is_receiving = truth
                 print(self.is_receiving)
-            case "_":
+            case _:
                 print("Invalid attribute...\n")
 
     def log_print(self, toLog, shouldPrint = True):
-        global logging
         with self.logging_lock: self.logging += toLog
         if shouldPrint: print(toLog)
 
@@ -98,8 +100,14 @@ Command queue: {self.recv_queue}\n"
     async def receive_commands(self, websocket):
         while True:
             await asyncio.sleep(0)
-            result = await websocket.recv()
-            await self.recv_queue.put(result)
+            if self.is_receiving:
+                received = await websocket.recv()
+                result = msgpack.unpackb(received, object_pairs_hook=dict)
+
+                if result.get("Port"):
+                    self.client_udp_port = result["Port"]
+                        
+                await self.recv_queue.put(result)
 
     async def handle_client(self, websocket):
         if self.current_client is not None:
@@ -129,7 +137,7 @@ Command queue: {self.recv_queue}\n"
             term_coroutine = asyncio.to_thread(self.run_terminal)
             self.term_task = asyncio.create_task(term_coroutine)
             
-            arm_coroutine = asyncio.to_thread(arm.run_arm, self)
+            arm_coroutine = asyncio.to_thread(arm.run_arm, self, asyncio.get_event_loop())
             self.arm_task = asyncio.create_task(arm_coroutine)
 
             video_coroutine = asyncio.to_thread(video.run_video, self)
