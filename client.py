@@ -5,17 +5,22 @@ import msgpack
 import cv2 as cv
 import numpy as np
 
-# Copied from the docs
 class DatagramHandler(asyncio.DatagramProtocol):
     buffer = bytearray()
+    img = None
+
     def connection_made(self, transport):
         self.transport = transport
     
     def datagram_received(self, data, addr):
-        self.buffer.extend(data)
-        print(f"Data received: {data} from {addr}")
+        if (len(data) == 1):
+            image_array = np.frombuffer(self.buffer.copy(), dtype=np.uint8)
+            self.img = cv.imdecode(image_array, cv.IMREAD_COLOR)
 
-# Original
+            self.buffer.clear()
+        else:
+            self.buffer.extend(data)
+            self.img = None
 
 host_addr = "localhost"
 host_port = 8765
@@ -37,18 +42,15 @@ async def receive():
         #     print("Connection closed!\n")
         
         loop = asyncio.get_running_loop()
-        transport, protocol = await loop.create_datagram_endpoint(
+        _, protocol = await loop.create_datagram_endpoint(
             DatagramHandler,
             local_addr=("localhost", 3000))
 
-        await asyncio.sleep(2)
-        print(len(protocol.buffer))
-        image_array = np.frombuffer(protocol.buffer, dtype=np.uint8)
-        img = cv.imdecode(image_array, cv.IMREAD_COLOR)
-        cv.imshow("Received image", img)
-        cv.waitKey()
-
-        await asyncio.sleep(60)
+        while True:
+            await asyncio.sleep(0)
+            if (protocol.img is not None):
+                cv.imshow("Received feed", protocol.img)
+                cv.waitKey(1)
 
 if __name__ == "__main__":
     asyncio.run(receive())

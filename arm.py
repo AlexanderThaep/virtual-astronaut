@@ -11,6 +11,6 @@ async def loop(main, event_loop):
             main.client_udp_port = result["Port"]
 
         main.log_print(f"Command received: {result}\n", False)
-
+    
 def run_arm(main, event_loop):
     asyncio.run(loop(main, event_loop))

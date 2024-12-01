@@ -81,7 +81,7 @@ Command queue: {self.recv_queue}\n"
             return
 
     async def periodic_ping(self, seconds, websocket):
-        while True:
+        while self.active:
             try:
                 await asyncio.sleep(seconds)
                 await websocket.ping()
@@ -97,7 +97,7 @@ Command queue: {self.recv_queue}\n"
             self.log_print(f"[{formatted_timestamp}] Heartbeat ping!\n", False)
 
     async def receive_commands(self, websocket):
-        while True:
+        while self.active:
             await asyncio.sleep(0)
             if self.is_receiving:
                 received = await websocket.recv()
