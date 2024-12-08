@@ -27,6 +27,18 @@ host_port = 8765
 
 packer = msgpack.Packer() 
 
+async def just_receive():
+    loop = asyncio.get_running_loop()
+    _, protocol = await loop.create_datagram_endpoint(
+        DatagramHandler,
+        local_addr=("localhost", 3000))
+
+    while True:
+        await asyncio.sleep(0)
+        if (protocol.img is not None):
+            cv.imshow("Received feed", protocol.img)
+            cv.waitKey(1)
+
 async def receive():
     uri = f"ws://{host_addr}:{host_port}"
     async with connect(uri) as websocket:
@@ -53,4 +65,4 @@ async def receive():
                 cv.waitKey(1)
 
 if __name__ == "__main__":
-    asyncio.run(receive())
+    asyncio.run(just_receive())

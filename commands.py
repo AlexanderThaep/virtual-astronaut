@@ -27,6 +27,23 @@ class CommandShell(cmd.Cmd):
         
         self.main.toggle(words)
 
+    def do_fake(self, args : str):
+        "Sets a fake loopback UDP client"
+        words = args.split(' ')
+        if (len(words) < 2):
+            print("Not enough arguments")
+            return
+        
+        self.main.client_udp_port = int(args[1])
+
+        class RemoteAddr:
+            remote_address = None
+
+        addr = RemoteAddr()
+        addr.remote_address = (args[0], self.main.client_udp_port)
+
+        self.main.current_client = addr
+
     def do_dump(self, args):
         "Print the current log history to the terminal"
         print("DUMP START ======================")
