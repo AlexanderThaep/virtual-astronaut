@@ -65,4 +65,4 @@ async def receive():
                 cv.waitKey(1)
 
 if __name__ == "__main__":
-    asyncio.run(just_receive())
+    asyncio.run(receive())

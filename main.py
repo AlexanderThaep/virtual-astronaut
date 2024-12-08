@@ -98,7 +98,7 @@ Command queue: {self.recv_queue}\n"
 
     async def receive_commands(self, websocket):
         while self.active:
-            await asyncio.sleep(0)
+            await asyncio.sleep(1)
             if self.is_receiving:
                 received = await websocket.recv()
                 await self.recv_queue.put(received)
@@ -117,17 +117,25 @@ Command queue: {self.recv_queue}\n"
         asyncio.create_task(self.receive_commands(websocket)).add_done_callback(self.task_finished_callback)
 
         while self.active:
-            await asyncio.sleep(0)
+            await asyncio.sleep(1)
 
     async def run_server(self):
-        self.log_print(f"Server initiated at [{ADDRESS}@{PORT}]\n", True)
         async with websockets.serve(self.handle_client, ADDRESS, PORT) as websocket:
+            address = None
+            port = None
+
+            for socket in websocket.sockets:
+                address = socket.getsockname()[0]
+                port = socket.getsockname()[1]
+
+            self.log_print(f"Server initiated at [{address}@{port}]\n", True)
             await websocket.serve_forever()
 
     async def run(self):
         try:
             self.server_task = asyncio.create_task(self.run_server())
 
+            await asyncio.sleep(0.1)
             term_coroutine = asyncio.to_thread(self.run_terminal)
             self.term_task = asyncio.create_task(term_coroutine)
             
