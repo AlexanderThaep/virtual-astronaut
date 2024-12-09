@@ -139,9 +139,11 @@ Command queue: {self.recv_queue}\n"
             term_coroutine = asyncio.to_thread(self.run_terminal)
             self.term_task = asyncio.create_task(term_coroutine)
             
+            await asyncio.sleep(0.1)
             arm_coroutine = asyncio.to_thread(arm.run_arm, self, asyncio.get_event_loop())
             self.arm_task = asyncio.create_task(arm_coroutine)
 
+            await asyncio.sleep(0.1)
             video_coroutine = asyncio.to_thread(video.run_video, self)
             self.video_task = asyncio.create_task(video_coroutine)
 
