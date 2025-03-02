@@ -103,23 +103,16 @@ public class VideoStream2 : MonoBehaviour
     //     }
     // }
 
-    // Send port information to Raspberry Pi
-    void SendPortInfo(int port)
-    {
-        byte[] portBytes = System.BitConverter.GetBytes(port); // Convert port to byte array
-        for (int i = 0; i < portBytes.Length; i++)
-        {
-            data[i] = portBytes[i]; // Store bytes in data array
-        }
+//    void SendPortInfo(int port)
+//    {
+//        byte[] portBytes = System.BitConverter.GetBytes(port); // Convert port to byte array
+//       m_Connection.Send(m_Driver, new DataStreamWriter(portBytes.Length, Allocator.Temp) { Write(portBytes) });
+//        Debug.Log("Sent port information: " + port);
+//    }
 
-        // Send the port number to the Raspberry Pi
-        m_Connection.Send(m_Driver, new DataStreamWriter(data.Length, Allocator.Temp) { Write(data) });
-        Debug.Log("Sent port information: " + port);
-    }
-
-    void OnDestroy()
-    {
-        m_Driver.Dispose(); // Clean up driver when done
-    }
+//    void OnDestroy()
+//    {
+//        m_Driver.Dispose(); // Clean up driver when done
+//    }
 }
 
