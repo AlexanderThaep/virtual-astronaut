@@ -26,7 +26,7 @@ public class VideoStream2 : MonoBehaviour
         ns.WithNetworkConfigParameters(receiveQueueCapacity: 2048);
 
         m_Driver = NetworkDriver.Create(ns);
-        var endpoint = NetworkEndpoint;
+        var endpoint = NetworkEndpoint.AnyIpv4;
         endpoint.Port = (ushort) port;
         m_Driver.Bind(endpoint);
 
