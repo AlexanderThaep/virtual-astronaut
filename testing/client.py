@@ -1,8 +1,8 @@
 import socket
 
 # Set up the client
-SERVER_IP = "192.168.1.100"  # Change this to your Raspberry Pi's IP
-PORT = 12345
+SERVER_IP = "10.42.0.23"  # Change this to your Raspberry Pi's IP
+PORT = 3000
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((SERVER_IP, PORT))
