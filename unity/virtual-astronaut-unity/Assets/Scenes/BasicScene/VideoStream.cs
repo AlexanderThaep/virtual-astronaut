@@ -16,6 +16,8 @@ public class VideoStream2 : MonoBehaviour
     private List<byte> imageBuffer = new List<byte>();
     private NativeArray<byte> data;
 
+    //PC: 10.42.0.23
+    //RaspberryPi: 10.42.0.23 
     void Start()
     {
         NativeArray<byte> data = new NativeArray<byte>(2048, Allocator.Persistent); 
@@ -24,7 +26,7 @@ public class VideoStream2 : MonoBehaviour
         ns.WithNetworkConfigParameters(receiveQueueCapacity: 2048);
 
         m_Driver = NetworkDriver.Create(ns);
-        var endpoint = NetworkEndpoint.AnyIpv4;
+        var endpoint = NetworkEndpoint;
         endpoint.Port = (ushort) port;
         m_Driver.Bind(endpoint);
 
@@ -36,6 +38,9 @@ public class VideoStream2 : MonoBehaviour
         // var endpoint = NetworkEndPoint.LoopbackIpv4;
         // endpoint.Port = 8765;
         // m_Connection = m_Driver.Connect(endpoint);
+
+        SendPortInfo(port); 
+
 
         texture = new Texture2D(2, 2); // Placeholder size; will update later
     }
@@ -97,4 +102,24 @@ public class VideoStream2 : MonoBehaviour
     //         }
     //     }
     // }
+
+    // Send port information to Raspberry Pi
+    void SendPortInfo(int port)
+    {
+        byte[] portBytes = System.BitConverter.GetBytes(port); // Convert port to byte array
+        for (int i = 0; i < portBytes.Length; i++)
+        {
+            data[i] = portBytes[i]; // Store bytes in data array
+        }
+
+        // Send the port number to the Raspberry Pi
+        m_Connection.Send(m_Driver, new DataStreamWriter(data.Length, Allocator.Temp) { Write(data) });
+        Debug.Log("Sent port information: " + port);
+    }
+
+    void OnDestroy()
+    {
+        m_Driver.Dispose(); // Clean up driver when done
+    }
 }
+
