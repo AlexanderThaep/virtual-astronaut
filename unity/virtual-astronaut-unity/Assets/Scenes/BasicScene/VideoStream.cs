@@ -16,8 +16,13 @@ public class VideoStream2 : MonoBehaviour
     private List<byte> imageBuffer = new List<byte>();
     private NativeArray<byte> data;
 
-    //PC: 10.42.0.23
-    //RaspberryPi: 10.42.0.23 
+    private NetworkConnection m_Connection;
+    private string serverIP = "10.42.0.1";  //The IP address of the server
+    private ushort serverPort = 8765;        //The port number for the connection
+    private string clientIP = "10.42.0.23";  //The IP address of the server
+    private ushort clinetPort = 3000;        //The port number for the connection
+    private bool isConnected = false;
+
     void Start()
     {
         NativeArray<byte> data = new NativeArray<byte>(2048, Allocator.Persistent); 
@@ -106,7 +111,7 @@ public class VideoStream2 : MonoBehaviour
 //    void SendPortInfo(int port)
 //    {
 //        byte[] portBytes = System.BitConverter.GetBytes(port); // Convert port to byte array
-//       m_Connection.Send(m_Driver, new DataStreamWriter(portBytes.Length, Allocator.Temp) { Write(portBytes) });
+//        m_Connection.Send(m_Driver, new DataStreamWriter(portBytes.Length, Allocator.Temp) { Write(portBytes) });
 //        Debug.Log("Sent port information: " + port);
 //    }
 
