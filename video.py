@@ -17,7 +17,7 @@ def run_video(main):
         time.sleep(TARGET_FRAMERATE)
         if main.client_udp_port and main.current_client:
             client = main.current_client
-            _, frame = cam.capture_array()
+            frame = cam.capture_array()
             img_bytes = cv.imencode('.jpg', frame, [int(cv.IMWRITE_JPEG2000_COMPRESSION_X1000), 50])[1].tobytes()
             end_buffer = bytearray(1)
 
