@@ -30,5 +30,5 @@ def run_video(main):
                                 main.client_udp_port))
             udp_socket.sendto(end_buffer, (client.remote_address[0], main.client_udp_port))
 
-    cam.release()
+    cam.stop()
     print("Cutting video...\n")
