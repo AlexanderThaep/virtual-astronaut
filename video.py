@@ -1,6 +1,7 @@
 import time
 import socket
 import cv2 as cv
+import picamera2 as pi
 
 # img = cv.imread("doge.png")
 # img_data = cv.imencode('.jpg', img, [int(cv.IMWRITE_JPEG2000_COMPRESSION_X1000), 50])[1].tobytes()
@@ -9,13 +10,14 @@ TARGET_FRAMERATE = 1/30
 
 def run_video(main):
     udp_socket = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
-    cam = cv.VideoCapture(0)
+    cam = pi.Picamera2()
+    cam.start()
 
     while main.active:
         time.sleep(TARGET_FRAMERATE)
         if main.client_udp_port and main.current_client:
             client = main.current_client
-            _, frame = cam.read()
+            _, frame = cam.capture_array()
             img_bytes = cv.imencode('.jpg', frame, [int(cv.IMWRITE_JPEG2000_COMPRESSION_X1000), 50])[1].tobytes()
             end_buffer = bytearray(1)
 

@@ -1,7 +1,5 @@
 import asyncio
-import asyncio.events
-import websockets.exceptions
-import websockets.asyncio.server
+import websockets
 
 from threading import Lock
 from datetime import datetime
