@@ -20,7 +20,7 @@ public class VideoStream2 : MonoBehaviour
     private string serverIP = "10.42.0.1";  //The IP address of the server
     private ushort serverPort = 8765;        //The port number for the connection
     private string clientIP = "10.42.0.23";  //The IP address of the server
-    private ushort clinetPort = 3000;        //The port number for the connection
+    private ushort clientPort = 3000;        //The port number for the connection
     private bool isConnected = false;
 
     void Start()
@@ -43,9 +43,6 @@ public class VideoStream2 : MonoBehaviour
         // var endpoint = NetworkEndPoint.LoopbackIpv4;
         // endpoint.Port = 8765;
         // m_Connection = m_Driver.Connect(endpoint);
-
-        SendPortInfo(port); 
-
 
         texture = new Texture2D(2, 2); // Placeholder size; will update later
     }
