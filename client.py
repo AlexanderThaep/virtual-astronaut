@@ -1,6 +1,8 @@
 import asyncio
 from websockets.asyncio.client import connect
 
+import sys
+
 import msgpack
 import cv2 as cv
 import numpy as np
@@ -25,13 +27,16 @@ class DatagramHandler(asyncio.DatagramProtocol):
 host_addr = "localhost"
 host_port = 8765
 
+client_addr = "10.42.0.23"
+client_port = 3001
+
 packer = msgpack.Packer() 
 
 async def just_receive():
     loop = asyncio.get_running_loop()
     _, protocol = await loop.create_datagram_endpoint(
         DatagramHandler,
-        local_addr=("localhost", 3000))
+        local_addr=(client_addr, client_port))
 
     while True:
         await asyncio.sleep(0)
@@ -44,7 +49,7 @@ async def receive():
     async with connect(uri) as websocket:
         await asyncio.sleep(1)
 
-        packed = msgpack.packb({"Port": 3000}) 
+        packed = msgpack.packb({"Port": client_port}) 
         await websocket.send(packed)
         # try:
         #     async for message in websocket:
@@ -56,7 +61,7 @@ async def receive():
         loop = asyncio.get_running_loop()
         _, protocol = await loop.create_datagram_endpoint(
             DatagramHandler,
-            local_addr=("localhost", 3000))
+            local_addr=(client_addr, client_port))
 
         while True:
             await asyncio.sleep(0)
@@ -65,4 +70,9 @@ async def receive():
                 cv.waitKey(1)
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+    	host_addr = sys.argv[1]
+    if len(sys.argv) > 2:
+    	host_port = sys.argv[2]
+
     asyncio.run(receive())

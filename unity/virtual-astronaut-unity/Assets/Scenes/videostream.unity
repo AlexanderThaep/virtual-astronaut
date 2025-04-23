@@ -362,7 +362,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cc92e5dd469249f38c43469c4368a20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  port: 3000
+  clientAddr: 10.42.0.23
+  clientPort: 3000
 --- !u!1 &961739749
 GameObject:
   m_ObjectHideFlags: 0
