@@ -28,7 +28,7 @@ class CommandShell(cmd.Cmd):
         self.main.toggle(words)
 
     def do_fake(self, args : str):
-        "Sets a fake UDP client"
+        "Sets a fake UDP client (ex: fake address port)"
         words = args.split(' ')
         if (len(words) < 2):
             print("Not enough arguments")

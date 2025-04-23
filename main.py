@@ -1,7 +1,6 @@
 import asyncio
 import asyncio.events
-import websockets.exceptions
-import websockets.asyncio.server
+import websockets
 
 from threading import Lock
 from datetime import datetime
@@ -12,7 +11,7 @@ import video
 
 # Constants and configuration
 
-ADDRESS = "localhost"
+ADDRESS = "0.0.0.0"
 PORT = 8765
 PING_DELAY = 5.0
 
@@ -43,8 +42,8 @@ class Main():
 Current client: {self.current_client}\n\
 Client UDP port: {self.client_udp_port}\n\
 Active: {self.active}\n\
-Is sending: {self.is_sending}\n\
-Is receiving: {self.is_receiving}\n\
+sending: {self.is_sending}\n\
+receiving: {self.is_receiving}\n\
 Server Task: {self.server_task is not None}\n\
 Terminal Task: {self.term_task is not None}\n\
 Arm Task: {self.arm_task is not None}\n\
